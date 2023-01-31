@@ -1,0 +1,38 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpipe
+  labels:
+    app: wordpipe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpipe
+  template:
+    metadata:
+      labels:
+        app: wordpipe
+    spec:
+      volumes:
+        - name : host-path
+          hostPath:
+            path: /minikubeContainer/path
+      containers:
+        - name: wp
+          image: mhj592/wordpipe:latest
+          env:
+            - name: KAFKA_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-global
+                  key: KAFKA_TOPIC
+            - name: KAFKA_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-global
+                  key: KAFKA_SERVER
+          volumeMounts:
+            - name: host-path
+              mountPath: /app/data
